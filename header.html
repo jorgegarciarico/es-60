@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Euro Seating America</title>
+  
+  <style>
+    :root {
+      --primary: #f26522;
+      --primary-hover: #d85416;
+      --navy: #0d1e38;
+      --navy-dark: #0033a1;
+      --text: #2d3748;
+      --text-muted: #64748b;
+      --border-light: rgba(226, 232, 240, 0.85);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+      --shadow-lg: 0 16px 36px -6px rgba(13, 30, 56, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background-color: #fcfcfd;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.8rem;
+    }
+
+    .top-container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 6px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .social-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .social-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      background: #f1f5f9;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-pill:hover {
+      background: var(--navy);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .social-pill svg {
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+    }
+
+    .lang-switcher select {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* HEADER FLOTANTE */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+    }
+
+    /* Fondo blur separado para no afectar el position: fixed del menú móvil */
+    .site-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: -1;
+    }
+
+    .nav-container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* LOGO OFICIAL */
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .brand-logo:hover {
+      opacity: 0.9;
+    }
+
+    .brand-logo-svg {
+      height: 46px;
+      width: auto;
+      display: block;
+    }
+
+    /* NAVEGACIÓN Y ENLACES */
+    .main-nav {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-items {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: 32px;
+    }
+
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      background: none;
+      border: none;
+      font-family: inherit;
+      width: 100%;
+      color: var(--navy);
+      font-size: 0.92rem;
+      font-weight: 500;
+      padding: 12px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      transition: color 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .nav-link:hover,
+    .nav-item.active .nav-link {
+      color: var(--primary);
+    }
+
+    .nav-item.active .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .chevron-icon {
+      transition: transform 0.25s ease;
+    }
+
+    /* MEGAMENÚ DESKTOP */
+    .mega-menu {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 660px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    /* Puente invisible para que el cursor no pierda el hover en desktop */
+    .mega-menu::before {
+      content: '';
+      position: absolute;
+      top: -16px;
+      left: 0;
+      width: 100%;
+      height: 16px;
+      background: transparent;
+    }
+
+    @media (min-width: 961px) {
+      .nav-item:hover .mega-menu {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+      .nav-item:hover .chevron-icon {
+        transform: rotate(180deg);
+      }
+    }
+
+    .mega-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .mega-card:hover {
+      background: #f8fafc;
+      transform: translateX(2px);
+    }
+
+    .mega-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #fff3ed;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .mega-card-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .mega-card-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+
+    .mega-card-desc {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .mega-card-featured {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #0d1e38 0%, #1e3a5f 100%);
+      padding: 12px 18px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #ffffff;
+      text-decoration: none;
+      margin-top: 4px;
+      transition: opacity 0.2s;
+    }
+
+    .mega-card-featured:hover {
+      opacity: 0.95;
+    }
+
+    .mega-card-featured span {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+    }
+
+    .mega-card-featured strong {
+      font-size: 0.88rem;
+      color: #ffffff;
+      display: block;
+    }
+
+    .mega-card-featured svg {
+      width: 16px;
+      height: 16px;
+      stroke: #ffffff;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    /* BOTÓN CTA */
+    .btn-contact {
+      background: var(--primary);
+      color: #ffffff !important;
+      padding: 9px 20px !important;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      box-shadow: 0 4px 14px rgba(242, 101, 34, 0.25);
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-contact:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 6px 18px rgba(242, 101, 34, 0.35);
+      transform: translateY(-1px);
+    }
+
+    /* ELEMENTOS MÓVILES (OCULTOS EN DESKTOP) */
+    .burger-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      color: var(--navy);
+      margin-left: auto; /* Alinea el botón totalmente a la derecha */
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .burger-btn:hover {
+      background: #f1f5f9;
+      color: var(--primary);
+    }
+
+    .mobile-menu-header {
+      display: none;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 30, 56, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 998;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* RESPONSIVE MÓVIL Y TABLET */
+    @media (max-width: 960px) {
+      .burger-btn {
+        display: inline-flex;
+      }
+
+      .brand-logo-svg {
+        height: 40px;
+      }
+
+      /* Contenedor deslizable lateral */
+      .nav-items {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: -100%;
+        width: 85%;
+        max-width: 360px;
+        height: 100vh;
+        height: 100dvh;
+        background: #ffffff;
+        box-shadow: -12px 0 30px rgba(13, 30, 56, 0.15);
+        flex-direction: column;
+        align-items: stretch;
+        padding: 20px 22px 48px;
+        gap: 6px;
+        transition: right 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        z-index: 1001;
+      }
+
+      /* Espaciador final garantizado para que el botón nunca quede pegado abajo */
+      .nav-items::after {
+        content: '';
+        display: block;
+        min-height: 28px;
+        flex-shrink: 0;
+      }
+
+      .nav-items.open {
+        right: 0;
+      }
+
+      /* Cabecera interna del menú móvil con botón X */
+      .mobile-menu-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 14px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .mobile-menu-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+      }
+
+      .close-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        color: var(--navy);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .close-menu-btn:hover {
+        background: #fee2e2;
+        border-color: #fecaca;
+        color: #dc2626;
+      }
+
+      .nav-item {
+        width: 100%;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .nav-item:last-child {
+        border-bottom: none;
+      }
+
+      .nav-link {
+        padding: 12px 4px;
+        font-size: 0.98rem;
+      }
+
+      .nav-item.active .nav-link::after {
+        display: none;
+      }
+
+      /* Submenú de Productos en móvil (abierto por defecto) */
+      .mega-menu {
+        position: static;
+        width: 100%;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        grid-template-columns: 1fr;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        padding: 4px 0 12px 6px;
+        gap: 6px;
+        display: grid; /* Abierto por defecto */
+      }
+
+      /* Estado contraído cuando el usuario hace clic en Productos */
+      .dropdown-parent.collapsed .mega-menu {
+        display: none;
+      }
+
+      /* Flecha rotada hacia arriba cuando está abierto (por defecto) */
+      .dropdown-parent .chevron-icon {
+        transform: rotate(180deg);
+      }
+
+      /* Flecha hacia abajo cuando está contraído */
+      .dropdown-parent.collapsed .chevron-icon {
+        transform: rotate(0deg);
+      }
+
+      .mega-menu::before {
+        display: none;
+      }
+
+      .mega-card {
+        padding: 8px 10px;
+      }
+
+      .mega-card-featured {
+        grid-column: span 1;
+        margin-top: 6px;
+      }
+
+      .btn-contact {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+        margin-top: 14px;
+        padding: 12px 20px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- OVERLAY PARA CERRAR AL DAR CLIC AFUERA -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-container">
+      <div class="social-pills">
+        <!-- Icono Oficial de WhatsApp (Burbuja + Teléfono interior) -->
+        <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" class="social-pill" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24">
+            <path d="M12.031 2c-5.516 0-9.969 4.453-9.969 9.969 0 1.766.469 3.484 1.359 5.016L2 22l5.156-1.359c1.484.813 3.156 1.25 4.875 1.25 5.516 0 9.969-4.453 9.969-9.969S17.547 2 12.031 2zm5.828 14.125c-.25.703-1.438 1.344-2 1.422-.516.078-1.172.109-1.906-.125-.453-.141-1.031-.328-1.766-.641-3.109-1.344-5.141-4.469-5.297-4.672-.156-.203-1.266-1.688-1.266-3.219s.797-2.281 1.078-2.594c.281-.313.625-.391.828-.391.203 0 .406.016.594.016.188.016.438-.078.688.531.25.609.859 2.094.938 2.25.078.156.125.344.031.547-.094.203-.141.328-.297.5-.156.172-.313.391-.453.516-.141.141-.297.297-.125.594.172.297.766 1.266 1.641 2.047 1.125 1 2.078 1.313 2.375 1.469.297.156.469.125.641-.078.172-.203.734-.859.938-1.156.203-.297.391-.25.656-.156.266.094 1.688.797 1.984.938.297.141.484.219.563.344.078.125.078.719-.172 1.422z"/>
+          </svg>
+        </a>
+        <!-- Telegram -->
+        <a href="https://t.me/" target="_blank" rel="noopener noreferrer" class="social-pill" aria-label="Telegram">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.77-1.17 3.35-1.37 3.73-1.38.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+        </a>
+        <!-- Instagram -->
+        <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" class="social-pill" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+      </div>
+
+      <div class="lang-switcher">
+        <select aria-label="Idioma">
+          <option value="es">ES</option>
+          <option value="en">EN</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER PRINCIPAL -->
+  <header class="site-header">
+    <div class="nav-container">
+      
+      <!-- LOGO OFICIAL EMBEBIDO DIRECTAMENTE DESDE TU ARCHIVO SVG -->
+      <a href="index.html" class="brand-logo" aria-label="Euro Seating America">
+        <svg class="brand-logo-svg" id="a" aria-label="Euro Seating America" role="img" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 589.8 240.3">
+  <g>
+    <path d="M289.8,64h-19.1v7.3h17.6v11.7h-17.6v9.1h19.8v11.7h-32.9v-51.6h32.2v11.8Z" fill="#0033a1"/>
+    <path d="M328.4,86.4v-34.2h12.6v34.4c0,11.4-9.8,17.9-20.4,17.9s-20.5-6.6-20.5-17.9v-34.4h12.6v34.2c0,4.2,4.1,6.3,7.9,6.3s7.8-2.1,7.8-6.3Z" fill="#0033a1"/>
+    <path d="M396.3,101.9v1.9h-14.8l-8.9-15.2h-6.9v15.2h-13.2v-51.6h22.6c20.3,0,24,24.5,10.9,33.3l10.1,16.4ZM375.3,64c-3.1,0-6.3,0-9.4,0v12.9h9.4c7.2,0,7.5-12.8,0-12.9Z" fill="#0033a1"/>
+    <path d="M401.2,78.1c0-35.7,53-35.7,53,0s-53,35.8-53,0ZM440.7,78.1c0-18.6-25.9-18.6-25.9,0s25.9,18.7,25.9,0Z" fill="#0033a1"/>
+  </g>
+  <g>
+    <path d="M284.2,158.2c0-3.6-4.3-4.4-9.4-4.7-11.2-.8-18.6-4.6-18.7-15.9-.4-22.3,39.7-22.3,39.4,0h-12.5c0-6.9-13.9-6.3-14.3-.1-.3,3.9,3.5,4.7,8.2,5.2,10.3,1.1,20.3,2.7,20.3,15.6,0,21.7-42,22.1-41.8-.7h12.8c0,6.6,16.2,6.6,16.2.6Z" fill="#0033a1"/>
+    <path d="M338.7,133.6h-19.1v7.3h17.6v11.7h-17.6v9.1h19.8v11.7h-32.9v-51.6h32.2v11.8Z" fill="#0033a1"/>
+    <path d="M379,166.9h-20.4l-3,6.5h-12.9v-1.9l23.2-50.4h5.7l23.3,50.4v1.9h-12.9l-3-6.5ZM368.7,142l-5.8,13.6h11.8l-6-13.6Z" fill="#0033a1"/>
+    <path d="M391.6,133.6v-11.8h38.4v11.8h-12.6v39.8h-13.1v-39.8h-12.7Z" fill="#0033a1"/>
+    <path d="M461.8,161.8v11.6h-26.2v-11.6h6.6v-28.5h-6v-11.5h25.2v11.5h-6v28.5h6.6Z" fill="#0033a1"/>
+    <path d="M485.8,148v25.4h-13.6v-51.9h4.8l26.1,25.5v-25.3h13.5v51.7h-4.7l-26-25.4Z" fill="#0033a1"/>
+    <path d="M551.5,121.1c10.4,0,21.2,5.5,23.8,18.3h-13c-2.1-4.4-5.5-6.2-10.8-6.2-8.3,0-12.8,6.5-12.8,14.4s5,14.2,12.8,14.2,8.7-1.4,11.1-6.3h-11v-11.4h24.4c.3,5.2.3,10.1-1.5,15.1-3.7,10.8-13.5,14.9-23,14.9s-26.4-8.8-26.5-26.4c0-17.6,13.4-26.5,26.5-26.5Z" fill="#0033a1"/>
+  </g>
+  <g>
+    <path d="M289.2,233.8h-18.7l-2.8,6h-11.9v-1.8l21.4-46.4h5.2l21.5,46.4v1.8h-11.9l-2.8-6ZM279.7,210.9l-5.4,12.5h10.9l-5.5-12.5Z" fill="#f59230"/>
+    <path d="M351.3,192.1h4.3v47.7h-12.4v-21.2l-10.1,10.6h-1.4l-10-10.6v21.2h-12.4v-47.7h4.5l18.6,20.6,18.9-20.6Z" fill="#f59230"/>
+    <path d="M395.3,203.1h-17.6v6.7h16.2v10.8h-16.2v8.4h18.2v10.8h-30.3v-47.5h29.7v10.9Z" fill="#f59230"/>
+    <path d="M445.1,238v1.8h-13.6l-8.1-14h-6.3v14h-12.2v-47.5h20.8c18.7,0,22.1,22.5,10,30.7l9.3,15.1ZM425.8,203.1c-2.9,0-5.8,0-8.7,0v11.9h8.7c6.6,0,6.9-11.8,0-11.9Z" fill="#f59230"/>
+    <path d="M474.5,229.1v10.7h-24.1v-10.7h6v-26.3h-5.6v-10.6h23.2v10.6h-5.6v26.3h6Z" fill="#f59230"/>
+    <path d="M503.9,191.7c9.8,0,20.5,5.4,22.3,18.1h-12c-1.7-4.8-5.3-7-10.4-7s-11.8,5.4-11.8,13.2,4.6,13.1,11.8,13.2c5.2,0,9.3-2.6,10.6-7.7h12c-1.8,13.4-12.4,18.7-22.5,18.7-12.1,0-24.3-8.1-24.4-24.2,0-16.2,12.3-24.3,24.4-24.3Z" fill="#f59230"/>
+    <path d="M561.7,233.8h-18.7l-2.8,6h-11.9v-1.8l21.4-46.4h5.2l21.5,46.4v1.8h-11.9l-2.8-6ZM552.3,210.9l-5.4,12.5h10.9l-5.5-12.5Z" fill="#f59230"/>
+  </g>
+  <path d="M68.1,31.2h64.3c14.3,0,28.3,5.7,30.3,19.3h33.4C196,13.5,164.3.3,133.3,0h0S0,0,0,0v31.2h68.1ZM136,71.7c-6.3-.7-12.2-1.6-17.2-3.1-.3,0-.6-.2-.9-.3-.5-.2-.9-.3-1.4-.5-.2,0-.5-.2-.7-.3-.6-.3-1.3-.5-1.8-.8-.2,0-.3-.2-.5-.3-.6-.3-1.2-.6-1.7-1,0,0,0,0,0,0-.6-.4-1.2-.8-1.7-1.2,0,0-.1-.1-.2-.2-1.1-.9-2.1-1.9-2.9-3.1,0,0,0,0,0,0-1.6-2.4-2.6-5.3-2.7-8.9h0c0-.1,0-.2,0-.4,0-1.1.1-2.2.4-3.3h-35.2c0,1.3-.1,2.6-.1,4,0,6.1,1,11.5,2.7,16.2h0s-71.8,0-71.8,0v31.2h129s-8-.8.8,0c16,1.2,36.4,2.9,36.4,21.9s-17.2,21-31.9,21-10.2-.6-14.9-2c-.4-.1-.8-.2-1.2-.4-.3,0-.6-.2-.8-.3-.4-.1-.7-.3-1.1-.4-.3-.1-.6-.2-.9-.3-.3-.1-.6-.3-1-.4-.3-.1-.6-.3-.9-.4-.3-.1-.6-.3-.8-.4-.3-.2-.7-.4-1-.5-.2-.1-.5-.3-.7-.4-.4-.2-.7-.5-1.1-.7-.2-.1-.3-.2-.5-.3-.4-.3-.9-.6-1.3-1,0,0-.1,0-.2-.1-1.5-1.2-2.8-2.6-3.9-4.1-2-2.8-3.2-6.1-3.4-10h-34.1c0,7.4,1.4,14,4,19.8h0s-70.7,0-70.7,0v33.1h133.3c.4,0,.8,0,1.2,0,32.9-.7,66.9-12.9,66.9-52.2s-30.3-46.9-65.5-50" fill="#f59230"/>
+  <g>
+    <path d="M583.1,120c-3.7,0-6.8,3-6.8,6.8s3,6.8,6.8,6.8,6.8-3,6.8-6.8-3-6.8-6.8-6.8ZM583.1,132.4c-3.2,0-5.7-2.6-5.7-5.7s2.6-5.7,5.7-5.7,5.7,2.6,5.7,5.7-2.6,5.7-5.7,5.7Z" fill="#0033a1"/>
+    <path d="M581.1,123c.4,0,1.1-.1,1.7-.1.9,0,1.5.2,2,.6.3.3.5.8.5,1.3,0,.9-.6,1.5-1.3,1.7h0c.5.2.8.7,1,1.4.2.9.4,1.6.5,1.9h-.9c-.1-.2-.3-.8-.5-1.6-.2-.9-.6-1.3-1.4-1.3h-.8v2.9h-.9v-6.7ZM582,126.1h.9c.9,0,1.5-.5,1.5-1.3s-.6-1.3-1.6-1.3c-.4,0-.7,0-.9,0v2.5Z" fill="#0033a1"/>
+  </g>
+</svg>
+      </a>
+
+      <!-- NAVEGACIÓN -->
+      <nav class="main-nav">
+        <ul class="nav-items" id="navItems">
+          
+          <!-- Cabecera exclusiva para móvil con botón de cerrar (X) -->
+          <li class="mobile-menu-header">
+            <span class="mobile-menu-title">Menú de navegación</span>
+            <button class="close-menu-btn" id="closeMenuBtn" aria-label="Cerrar menú">
+              <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </li>
+
+          <li class="nav-item active"><a href="index.html" class="nav-link">Empresa</a></li>
+          <li class="nav-item"><a href="#nosotros" class="nav-link">Nosotros</a></li>
+          <li class="nav-item"><a href="#catalogos" class="nav-link">Catálogos</a></li>
+
+          <!-- PRODUCTOS (En móvil inicia abierto por defecto y se despliega/retrae con clic) -->
+          <li class="nav-item dropdown-parent" id="productosItem">
+            <button type="button" class="nav-link" id="productosToggle" aria-expanded="true">
+              <span>Productos</span>
+              <svg class="chevron-icon" width="11" height="7" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M1 1L5 5L9 1" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            
+            <div class="mega-menu" id="productosMenu">
+              <!-- 1. Auditorios -->
+              <a href="#auditorios" class="mega-card">
+                <div class="mega-card-icon">
+                  <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </div>
+                <div>
+                  <div class="mega-card-title">Auditorios</div>
+                  <div class="mega-card-desc">Acústica, confort y optimización de aforo.</div>
+                </div>
+              </a>
+
+              <!-- 2. Teatro -->
+              <a href="#teatro" class="mega-card">
+                <div class="mega-card-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M9 10h.01M15 10h.01M9 15c1 1.5 5 1.5 6 0"></path></svg>
+                </div>
+                <div>
+                  <div class="mega-card-title">Teatro</div>
+                  <div class="mega-card-desc">Diseños clásicos y contemporáneos de gran elegancia.</div>
+                </div>
+              </a>
+
+              <!-- 3. Educacional -->
+              <a href="#educacional" class="mega-card">
+                <div class="mega-card-icon">
+                  <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                </div>
+                <div>
+                  <div class="mega-card-title">Educacional</div>
+                  <div class="mega-card-desc">Sistemas modulares y palas de escritura ergonómicas.</div>
+                </div>
+              </a>
+
+              <!-- 4. Cine & home cinema -->
+              <a href="#cine" class="mega-card">
+                <div class="mega-card-icon">
+                  <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                </div>
+                <div>
+                  <div class="mega-card-title">Cine & home cinema</div>
+                  <div class="mega-card-desc">Butacas reclinables y confort VIP cinematográfico.</div>
+                </div>
+              </a>
+
+              <!-- 5. Arenas / Estadios -->
+              <a href="#arenas-estadios" class="mega-card">
+                <div class="mega-card-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+                </div>
+                <div>
+                  <div class="mega-card-title">Arenas / Estadios</div>
+                  <div class="mega-card-desc">Polímeros de alta resistencia contra la intemperie.</div>
+                </div>
+              </a>
+
+              <!-- 6. Micra -->
+              <a href="#micra" class="mega-card">
+                <div class="mega-card-icon">
+                  <svg viewBox="0 0 24 24"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                </div>
+                <div>
+                  <div class="mega-card-title">Micra</div>
+                  <div class="mega-card-desc">Soluciones plegables y ultracompactas de espacio mínimo.</div>
+                </div>
+              </a>
+
+              <!-- 7. Línea Autor -->
+              <a href="#linea-autor" class="mega-card">
+                <div class="mega-card-icon">
+                  <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+                </div>
+                <div>
+                  <div class="mega-card-title">Línea Autor</div>
+                  <div class="mega-card-desc">Diseños exclusivos firmados por arquitectos de renombre.</div>
+                </div>
+              </a>
+
+              <!-- Banner de acción -->
+              <a href="#catalogos" class="mega-card-featured">
+                <div>
+                  <strong>¿Buscas especificaciones técnicas?</strong>
+                  <span>Descarga los catálogos en PDF</span>
+                </div>
+                <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </a>
+            </div>
+          </li>
+
+          <li class="nav-item"><a href="#galeria" class="nav-link">Galería</a></li>
+          <li class="nav-item">
+            <a href="#contacto" class="nav-link btn-contact">¡Contáctanos!</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Botón Hamburguesa (Alineado a la derecha) -->
+      <button class="burger-btn" id="burgerToggle" aria-label="Abrir menú">
+        <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+    </div>
+  </header>
+
+  <script>
+    const burgerToggle = document.getElementById('burgerToggle');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const navItems = document.getElementById('navItems');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const productosItem = document.getElementById('productosItem');
+    const productosToggle = document.getElementById('productosToggle');
+
+    function openMobileMenu() {
+      navItems.classList.add('open');
+      menuOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileMenu() {
+      navItems.classList.remove('open');
+      menuOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Abrir con botón hamburguesa
+    burgerToggle.addEventListener('click', openMobileMenu);
+
+    // Cerrar con el botón (X) dentro del menú
+    closeMenuBtn.addEventListener('click', closeMobileMenu);
+
+    // Cerrar al hacer clic fuera de la pestaña (en el overlay)
+    menuOverlay.addEventListener('click', closeMobileMenu);
+
+    // Desplegar / retraer "Productos" sin redireccionar nunca
+    productosToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.innerWidth <= 960) {
+        const isCollapsed = productosItem.classList.toggle('collapsed');
+        productosToggle.setAttribute('aria-expanded', !isCollapsed);
+      }
+    });
+  </script>
+
+</body>
+</html>
